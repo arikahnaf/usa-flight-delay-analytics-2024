@@ -14,7 +14,8 @@ __pycache__/
 .DS_Store
 
 # CSV files (Too big to track)
-data/
+data/raw/flight_data_2024.csv
+data/processed/flight_clean_data_2024.csv
 
 # Keep raw and processed sample files
 !data/raw/flight_data_2024_sample.csv

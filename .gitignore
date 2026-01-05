@@ -16,7 +16,3 @@ __pycache__/
 # CSV files (Too big to track)
 data/raw/flight_data_2024.csv
 data/processed/flight_clean_data_2024.csv
-
-# Keep raw and processed sample files
-!data/raw/flight_data_2024_sample.csv
-!data/processed/flight_clean_data_2024_sample.csv

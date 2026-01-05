@@ -3,37 +3,57 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-def hhmm_to_hour(series: pd.Series) -> pd.Series:
+US_STATE_TO_ABBR = {
+    "Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO",
+    "Connecticut":"CT","Delaware":"DE","District of Columbia":"DC","Florida":"FL","Georgia":"GA",
+    "Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY",
+    "Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN",
+    "Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH",
+    "New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH",
+    "Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD",
+    "Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV",
+    "Wisconsin":"WI","Wyoming":"WY"
+}
+
+def hhmm_to_hour_min(series: pd.Series):
     s = series.apply(lambda x: np.nan if pd.isna(x) else str(int(float(x))).zfill(4))
-    return s.apply(lambda x: np.nan if pd.isna(x) else int(x[:2])).astype("Int64")
+    hour = s.apply(lambda x: np.nan if pd.isna(x) else int(x[:2])).astype("Int64")
+    minute = s.apply(lambda x: np.nan if pd.isna(x) else int(x[2:])).astype("Int64")
+    return hour, minute
 
 def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
-    # Rename (same as notebook)
+    # Rename columns
     rename_map = {
         "fl_date": "flight_date",
         "op_unique_carrier": "operating_airline",
         "op_carrier_fl_num": "operating_flight_number",
+
         "origin": "origin_airport",
         "origin_city_name": "origin_city",
         "origin_state_nm": "origin_state",
+
         "dest": "destination_airport",
         "dest_city_name": "destination_city",
         "dest_state_nm": "destination_state",
+
         "crs_dep_time": "scheduled_departure_hhmm",
         "crs_arr_time": "scheduled_arrival_hhmm",
+
         "dep_delay": "departure_delay_raw_min",
         "arr_delay": "arrival_delay_raw_min",
+
         "carrier_delay": "carrier_delay_min",
         "weather_delay": "weather_delay_min",
         "nas_delay": "nas_delay_min",
         "security_delay": "security_delay_min",
         "late_aircraft_delay": "late_aircraft_delay_min",
+
         "cancelled": "is_cancelled",
         "diverted": "is_diverted",
     }
     chunk = chunk.rename(columns={k: v for k, v in rename_map.items() if k in chunk.columns})
 
-    # Drop unnecessary columns (optimize for Tableau)
+    # Drop unnecessary columns
     drop_cols = [
         "operating_flight_number",
         "dep_time","arr_time","wheels_off","wheels_on","taxi_out","taxi_in",
@@ -43,7 +63,7 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
     ]
     chunk = chunk.drop(columns=[c for c in drop_cols if c in chunk.columns])
 
-    # Types
+    # Type fixes
     chunk["flight_date"] = pd.to_datetime(chunk["flight_date"], errors="coerce")
 
     delay_cols = [
@@ -55,7 +75,7 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
             chunk[c] = pd.to_numeric(chunk[c], errors="coerce").fillna(0)
 
     # Drop missing key dims
-    core = ["flight_date","operating_airline","origin_airport","origin_city","origin_state"]
+    core = ["flight_date","operating_airline","origin_airport","origin_state"]
     chunk = chunk.dropna(subset=[c for c in core if c in chunk.columns])
 
     # Calendar fields
@@ -66,12 +86,30 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
     chunk["day_of_week_name"] = chunk["flight_date"].dt.day_name()
     chunk["week_of_year"] = chunk["flight_date"].dt.isocalendar().week.astype("Int64")
 
-    # Scheduled departure hour
+    # Scheduled departure parsing
     if "scheduled_departure_hhmm" in chunk.columns:
-        chunk["scheduled_departure_hour"] = hhmm_to_hour(chunk["scheduled_departure_hhmm"])
+        h, m = hhmm_to_hour_min(chunk["scheduled_departure_hhmm"])
+        chunk["scheduled_departure_hour"] = h
+        chunk["scheduled_departure_time"] = [
+            np.nan if pd.isna(hh) or pd.isna(mm) else f"{int(hh):02d}:{int(mm):02d}"
+            for hh, mm in zip(h.tolist(), m.tolist())
+        ]
+
+    # State abbreviations for Plotly maps
+    if "origin_state" in chunk.columns:
+        chunk["origin_state"] = chunk["origin_state"].astype(str).str.strip()
+        chunk["origin_state_abbr"] = chunk["origin_state"].map(US_STATE_TO_ABBR)
+
+    if "destination_state" in chunk.columns:
+        chunk["destination_state"] = chunk["destination_state"].astype(str).str.strip()
+        chunk["destination_state_abbr"] = chunk["destination_state"].map(US_STATE_TO_ABBR)
 
     # Engineered delay metrics
-    cause_cols = ["carrier_delay_min","weather_delay_min","nas_delay_min","security_delay_min","late_aircraft_delay_min"]
+    cause_cols = [
+        "carrier_delay_min","weather_delay_min","nas_delay_min","security_delay_min","late_aircraft_delay_min"
+    ]
+    cause_cols = [c for c in cause_cols if c in chunk.columns]  # safety
+
     chunk["is_operated"] = True
     if "is_cancelled" in chunk.columns and "is_diverted" in chunk.columns:
         chunk["is_operated"] = (chunk["is_cancelled"] == 0) & (chunk["is_diverted"] == 0)
@@ -80,7 +118,7 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
     chunk["departure_delay_min"] = chunk["departure_delay_raw_min"].clip(lower=0)
     chunk["is_delayed_15"] = chunk["is_operated"] & (chunk["arrival_delay_raw_min"] > 15)
 
-    chunk["total_delay_min"] = chunk[cause_cols].sum(axis=1)
+    chunk["total_delay_min"] = chunk[cause_cols].sum(axis=1) if cause_cols else 0
 
     bins = [-1, 15, 30, 60, 120, 10_000]
     labels = ["On time (≤15)", "16–30", "31–60", "61–120", "120+"]
@@ -93,15 +131,23 @@ def process_chunk(chunk: pd.DataFrame) -> pd.DataFrame:
         "security_delay_min": "Security",
         "late_aircraft_delay_min": "Late Aircraft",
     }
-    max_cause = chunk[cause_cols].idxmax(axis=1)
-    chunk["primary_delay_cause"] = np.where(chunk["total_delay_min"] > 0, max_cause.map(cause_label), "No Delay")
+
+    if cause_cols:
+        max_cause = chunk[cause_cols].idxmax(axis=1)
+        chunk["primary_delay_cause"] = np.where(
+            chunk["total_delay_min"] > 0,
+            max_cause.map(cause_label),
+            "No Delay"
+        )
+    else:
+        chunk["primary_delay_cause"] = "No Delay"
 
     chunk["country"] = "United States"
     return chunk
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--raw", required=True, help="Path to raw CSV (1.2GB)")
+    ap.add_argument("--raw", required=True, help="Path to raw CSV (large file)")
     ap.add_argument("--out", required=True, help="Path to output cleaned CSV")
     ap.add_argument("--chunksize", type=int, default=500_000)
     args = ap.parse_args()
@@ -111,12 +157,12 @@ def main():
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     first = True
-    for chunk in pd.read_csv(raw_path, chunksize=args.chunksize):
+    for chunk in pd.read_csv(raw_path, chunksize=args.chunksize, low_memory=False):
         cleaned = process_chunk(chunk)
         cleaned.to_csv(out_path, mode="w" if first else "a", header=first, index=False)
         first = False
 
-    print(f"Done. Wrote Tableau-ready dataset to: {out_path}")
+    print(f"Done. Wrote dashboard-ready dataset to: {out_path}")
 
 if __name__ == "__main__":
     main()

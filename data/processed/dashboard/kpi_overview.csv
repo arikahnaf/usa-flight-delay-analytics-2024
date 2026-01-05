@@ -1,0 +1,2 @@
+flights,delayed_flights,delay_rate,avg_arrival_delay_min,sum_arrival_delay_min,sum_total_delay_min
+7079081,1403388,0.19824437663589384,15.64077243924741,110722295.0,103795067.0

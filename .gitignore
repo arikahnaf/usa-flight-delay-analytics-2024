@@ -1,0 +1,21 @@
+*.log
+
+# venv
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# CSV files (Too big to track)
+data/
+
+# Keep raw and processed sample files
+!data/raw/flight_data_2024_sample.csv
+!data/processed/flight_clean_data_2024_sample.csv

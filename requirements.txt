@@ -1,5 +1,7 @@
 pandas
 numpy
+pyarrow
 jupyter
 ipykernel
-pyarrow
+streamlit
+plotly

@@ -1,6 +1,8 @@
 # USA Flight Delay Analytics (2024) ✈️
 
-### [🔗 View the Live Interactive Dashboard](https://YOUR_STREAMLIT_APP_LINK_HERE)
+### [🔗 View the Live Interactive Dashboard](https://usa-flight-delay-dashboard-2024.streamlit.app)
+
+[https://usa-flight-delay-dashboard-2024.streamlit.app](https://usa-flight-delay-dashboard-2024.streamlit.app)
 
 ## Overview
 

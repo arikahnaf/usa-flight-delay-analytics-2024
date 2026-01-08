@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 
-st.set_page_config(page_title="USA Flight Delay Analytics (2024)", layout="wide")
+st.set_page_config(page_title="Flight Delay Dashboard", layout="wide")
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DASH_DIR = REPO_ROOT / "data" / "processed" / "dashboard"
@@ -53,7 +53,7 @@ def rerun():
 ensure_files_exist()
 kpi, core, hour, cause, airport = load_tables()
 
-st.title("USA Flight Delay Dashboard 2024 ✈️")
+st.title("USA Flight Delay Dashboard (2024) ✈️")
 st.caption("by Arik Ahnaf")
 
 # ----------------------------

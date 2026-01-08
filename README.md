@@ -1,25 +1,24 @@
 # USA Flight Delay Analytics (2024) ✈️
 
-### [🔗 View the Live Interactive Dashboard](https://usa-flight-delay-dashboard-2024.streamlit.app)
-
-[https://usa-flight-delay-dashboard-2024.streamlit.app](https://usa-flight-delay-dashboard-2024.streamlit.app)
-
-## Overview
-
 This project analyzes U.S. flight delay data from **2024** to uncover trends in airline performance, airport congestion, and delay causes. The final output is an interactive **Streamlit** + **Plotly** dashboard designed for clear business and operational insights.
 
----
+### 🔗 Live Dashboard
 
-## Key Questions Answered
-
-- Which airlines have the highest **delay rates** and **average arrival delays**?
-- What airports and states experience the worst delays?
-- How do delays vary by **month**, **day of week**, and **scheduled departure hour**?
-- What are the primary causes of delays (Carrier, Weather, NAS, Security, Late Aircraft)?
+[usa-flight-delay-dashboard-2024.streamlit.app](https://usa-flight-delay-dashboard-2024.streamlit.app)
 
 ---
 
-## Tools Used
+## ❓ Key Questions Answered
+
+- Which **airlines** have the highest **delay rates**?
+- Which **states** experience the **worst delays**?
+- How do delays vary by **month**?
+- What are the primary **causes of delays**?
+- How often do **long delays** occur (**15+**, **30+**, **60+**, and **120+** **minutes**)?
+
+---
+
+## 🛠️ Tools Used
 
 - **Python** (Pandas, NumPy)
 - **Jupyter Notebook**
@@ -28,7 +27,7 @@ This project analyzes U.S. flight delay data from **2024** to uncover trends in 
 
 ---
 
-## ETL Pipeline Workflow
+## 🧪 ETL Pipeline Workflow
 
 This project is built around a repeatable ETL (Extract, Transform, Load) pipeline to produce dashboard-ready datasets from the raw Kaggle CSV.
 
@@ -42,7 +41,7 @@ This project is built around a repeatable ETL (Extract, Transform, Load) pipelin
 
 - The `notebooks/data_processing.ipynb` notebook documents the data preparation logic and validates the pipeline using the sample dataset. Key steps include:
 
-  - Renaming DOT/BTS-style column headers to business-friendly names
+  - Renaming column headers to business-friendly names
   - Dropping unnecessary operational fields to improve performance
   - Correcting data types (e.g., parsing `flight_date`, cleaning numeric delay fields)
   - Engineering dashboard-ready features such as:
@@ -82,8 +81,8 @@ cd usa-flight-delay-analytics-2024
 ### 2. Setup Environment
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -110,12 +109,11 @@ streamlit run app/app.py
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 ```
 usa-flight-delay-analytics-2024/
-├── app/
-│   └── app.py                                # Streamlit dashboard
+├── app/                                      # Streamlit dashboard
 ├── data/
 │   ├── processed/
 │       ├── flight_clean_data_2024_sample.csv # Processed sample output

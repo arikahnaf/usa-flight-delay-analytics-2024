@@ -18,6 +18,51 @@ This project analyzes U.S. flight delay data from **2024** to uncover trends in 
 
 ---
 
+## 📊 Visualizations & Features
+
+- **KPI** single-valued cards
+- **Pie** & **donut** charts
+- **Line charts** of delayed flights by month
+- **Choropleth maps** of USA
+- **Bar charts** of delayed flights by airline
+- Monthly summary & scorecard **tables**
+- **Filter** sidebar (Month, Airline, Origin/Destination State, Delay Cause)
+
+---
+
+## 📸 Screenshots
+
+### Dashboard landing page
+
+![Dashboard landing page](assets/main-view.png)
+&nbsp;
+
+### Dashboard view with filters sidebar open
+
+![Filters view](assets/filters.png)
+&nbsp;
+
+### Choropleth maps and vertical bars view
+
+![Maps and bars view](assets/maps-bars.png)
+&nbsp;
+
+### Tooltips on hover
+
+![Tooltip view](assets/hover-tooltip.png)
+
+---
+
+## ❗️ Troubleshoot
+
+#### App may be sleeping (happens with Streamlit free tier).
+
+To fix: Click "Yes, get this app back up!" button, then wait a few seconds for it to restart.
+
+![App is sleeping view](assets/app-sleep.png)
+
+---
+
 ## 🛠️ Tools Used
 
 - **Python** (Pandas, NumPy)
@@ -114,6 +159,7 @@ streamlit run app/app.py
 ```
 usa-flight-delay-analytics-2024/
 ├── app/                                      # Streamlit dashboard
+├── assets/                                   # Screenshots of dashboard
 ├── data/
 │   ├── processed/
 │       ├── flight_clean_data_2024_sample.csv # Processed sample output

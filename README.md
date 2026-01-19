@@ -16,8 +16,6 @@ This project analyzes U.S. flight delay data from **2024** to uncover trends in 
 - What are the primary **causes of delays**?
 - How often do **long delays** occur (**15+**, **30+**, **60+**, and **120+** **minutes**)?
 
----
-
 ## 📊 Visualizations & Features
 
 - **KPI** single-valued cards
@@ -27,8 +25,6 @@ This project analyzes U.S. flight delay data from **2024** to uncover trends in 
 - **Bar charts** of delayed flights by airline
 - Monthly summary & scorecard **tables**
 - **Filter** sidebar (Month, Airline, Origin/Destination State, Delay Cause)
-
----
 
 ## 📸 Screenshots
 
@@ -51,8 +47,6 @@ This project analyzes U.S. flight delay data from **2024** to uncover trends in 
 
 ![Tooltip view](assets/hover-tooltip.png)
 
----
-
 ## ❗️ Troubleshoot
 
 #### App may be sleeping (happens with Streamlit free tier).
@@ -61,16 +55,12 @@ To fix: Click "Yes, get this app back up!" button, then wait a few seconds for i
 
 ![App is sleeping view](assets/app-sleep.png)
 
----
-
 ## 🛠️ Tools Used
 
 - **Python** (Pandas, NumPy)
 - **Jupyter Notebook**
 - **Streamlit** + **Plotly**
 - **Kaggle Dataset**
-
----
 
 ## 🧪 ETL Pipeline Workflow
 
@@ -85,7 +75,6 @@ This project is built around a repeatable ETL (Extract, Transform, Load) pipelin
 ### Transform
 
 - The `notebooks/data_processing.ipynb` notebook documents the data preparation logic and validates the pipeline using the sample dataset. Key steps include:
-
   - Renaming column headers to business-friendly names
   - Dropping unnecessary operational fields to improve performance
   - Correcting data types (e.g., parsing `flight_date`, cleaning numeric delay fields)
@@ -104,15 +93,12 @@ This project is built around a repeatable ETL (Extract, Transform, Load) pipelin
 ### Load
 
 - The final cleaned dataset (generated locally) is saved as:
-
   - `data/processed/flight_clean_data_2024.csv`
 
 - For hosting and fast dashboard performance, small aggregated tables are generated and stored in:
   - `data/processed/dashboard/`
 
 These aggregated tables are used by the hosted Streamlit app.
-
----
 
 ## 📦 How to Run
 
@@ -152,8 +138,6 @@ python scripts/process_flight_data_in_chunks.py \
 streamlit run app/app.py
 ```
 
----
-
 ## 📂 Project Structure
 
 ```
@@ -172,8 +156,6 @@ usa-flight-delay-analytics-2024/
 ├── tableau/                                  # Workbook containing the dashboard
 └── requirements.txt                          # Dependencies
 ```
-
----
 
 ## 📚 Kaggle Dataset
 

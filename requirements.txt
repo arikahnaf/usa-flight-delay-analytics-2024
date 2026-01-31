@@ -1,6 +1,7 @@
-altair==4.2.2
 pandas
 numpy
 pyarrow
+jupyter
+ipykernel
 streamlit
 plotly
